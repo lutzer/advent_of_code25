@@ -44,18 +44,33 @@ impl AoCSolution for Solution1 {
 }
 
 impl Solution2 {
+
+    fn split_string(s: &str, chunk_size: usize) -> Vec<String> {
+        s.chars()
+            .collect::<Vec<char>>()
+            .chunks(chunk_size)
+            .map(|chunk| chunk.iter().collect())
+            .collect()
+    }
+
     fn get_invalid_ids_from_range(start: i64, end: i64) -> Vec<i64> {
         let mut invalids : Vec<i64> = vec![];
-        for val in start..(end+1) {
+        'outer: for val in start..(end+1) {
             let s = val.to_string();
-            if s.len() % 2 > 0 {
-                continue;
+           
+            for i in 1..(s.len()/2+1) {
+                // split in equal parts
+                let chunks = Solution2::split_string(&s, i);
+
+                // compare if all chunks are equal
+                let first = &chunks[0];
+                let is_invalid = chunks.iter().skip(1).all(|chunk| chunk == first);
+                if is_invalid {
+                    invalids.push(val);
+                    continue 'outer; 
+                }
             }
-            // split in the middle
-            let (left, right) = s.split_at(s.len() / 2);
-            if left == right {
-                invalids.push(val)
-            }
+            
         }
         return invalids;
     }
@@ -86,7 +101,7 @@ fn main() {
     let solution1 = Solution1 {};
     let solution2 = Solution2 {};
     run(
-        "Advent of code day X", 
+        "Advent of code day 2", 
         &fs::read_to_string("input.txt").expect("Input Error"), 
         &vec![&solution1 as &dyn AoCSolution, &solution2 as &dyn AoCSolution]
     );
@@ -123,17 +138,17 @@ mod tests {
 
      #[test]
     fn test_invalid_ids2() {
-        assert_eq!(Solution1::get_invalid_ids_from_range(11,22), vec![11,22]);
-        assert_eq!(Solution1::get_invalid_ids_from_range(99,115), vec![99, 111]);
-        assert_eq!(Solution1::get_invalid_ids_from_range(998,1012), vec![999, 1010]);
-        assert_eq!(Solution1::get_invalid_ids_from_range(1188511880,1188511890), vec![1188511885]);
-        assert_eq!(Solution1::get_invalid_ids_from_range(222220,222224), vec![222222]);
-        assert_eq!(Solution1::get_invalid_ids_from_range(1698522,1698528), vec![]);
-        assert_eq!(Solution1::get_invalid_ids_from_range(446443,446449), vec![446446]);
-        assert_eq!(Solution1::get_invalid_ids_from_range(38593856,38593862), vec![38593859]);
-        assert_eq!(Solution1::get_invalid_ids_from_range(565653,565659), vec![565656]);
-        assert_eq!(Solution1::get_invalid_ids_from_range(824824821,824824827), vec![824824824]);
-        assert_eq!(Solution1::get_invalid_ids_from_range(2121212118,2121212124), vec![2121212121]);
+        assert_eq!(Solution2::get_invalid_ids_from_range(11,22), vec![11,22]);
+        assert_eq!(Solution2::get_invalid_ids_from_range(99,115), vec![99, 111]);
+        assert_eq!(Solution2::get_invalid_ids_from_range(998,1012), vec![999, 1010]);
+        assert_eq!(Solution2::get_invalid_ids_from_range(1188511880,1188511890), vec![1188511885]);
+        assert_eq!(Solution2::get_invalid_ids_from_range(222220,222224), vec![222222]);
+        assert_eq!(Solution2::get_invalid_ids_from_range(1698522,1698528), vec![]);
+        assert_eq!(Solution2::get_invalid_ids_from_range(446443,446449), vec![446446]);
+        assert_eq!(Solution2::get_invalid_ids_from_range(38593856,38593862), vec![38593859]);
+        assert_eq!(Solution2::get_invalid_ids_from_range(565653,565659), vec![565656]);
+        assert_eq!(Solution2::get_invalid_ids_from_range(824824821,824824827), vec![824824824]);
+        assert_eq!(Solution2::get_invalid_ids_from_range(2121212118,2121212124), vec![2121212121]);
     }
 
     #[test]
