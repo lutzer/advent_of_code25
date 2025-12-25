@@ -1,6 +1,7 @@
 use std::process::exit;
 
 use clap::{Parser, Subcommand};
+use itertools::Itertools;
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
@@ -10,22 +11,25 @@ struct Cli {
 }
 
 pub fn run(title: &str, input: &str, solutions: &[&dyn AoCSolution]) {
-  let cli = Cli::parse();
-
-  let part = cli.part;
-
-  if part == 0 || part > solutions.len() {
-    println!("There is no solution defined for part {part}");
-    exit(0)
-  }
-
-  println!("> {title} - Calculating solution for part {part}.");
-
-  let result = solutions[part-1].solve(input);
-
-  println!("> Result: {result}");
+    let cli = Cli::parse();
+    
+    let part = cli.part;
+    
+    println!("# {title}");
+    
+    if part == 0 || part > solutions.len() {
+        let solutionlist = (1..=solutions.len()).map(|n| n.to_string()).join(", ");
+        println!("There is no solution defined for part {part}. Available parts are: [{solutionlist}]");
+        exit(0)
+    }
+    
+    println!("Calculating solution for part {part}.");
+    
+    let result = solutions[part-1].solve(input);
+    
+    println!("Result: {result}");
 }
 
 pub trait AoCSolution {
-  fn solve(&self, input: &str) -> i64;
+    fn solve(&self, input: &str) -> i64;
 }
