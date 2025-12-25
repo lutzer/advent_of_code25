@@ -33,3 +33,7 @@ pub fn run(title: &str, input: &str, solutions: &[&dyn AoCSolution]) {
 pub trait AoCSolution {
     fn solve(&self, input: &str) -> i64;
 }
+
+pub fn remove_line_breaks(s: &String) -> String {
+    return s.chars().filter(|c| !c.is_whitespace()).collect();
+}

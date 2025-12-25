@@ -1,10 +1,8 @@
 use common::{run, AoCSolution};
-use std::{fs, thread::current};
+use std::{fs};
 
 struct Solution1 {}
 struct Solution2 {}
-
-static DIAL_STEPS: i64 = 100;
 
 impl AoCSolution for Solution1 {
     fn solve(&self, input: &str) -> i64 {
@@ -32,10 +30,6 @@ fn main() {
 mod tests {
     use super::*;
     use indoc::indoc;
-
-    fn get_lines(s: &String, n: usize ) -> String {
-        s.lines().take(n).collect::<Vec<_>>().join("\n")
-    }
     
     #[test]
     fn test_part1() {
