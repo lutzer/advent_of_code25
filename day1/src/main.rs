@@ -38,20 +38,13 @@ impl AoCSolution for Solution2 {
         let mut current_position = 50;
         let mut zero_crossings = 0;
         for val in rotations {
-            print!("c: {current_position}+{val}=");
-            current_position += val;
-            while current_position < 0 {
-                if current_position - val > 0 {
+            let steps = val.abs();
+            for _ in 0..steps {
+                current_position = (current_position + val.signum() + DIAL_STEPS) % DIAL_STEPS;
+                if current_position == 0 {
                     zero_crossings += 1;
                 }
-                current_position += DIAL_STEPS;
-                
             }
-            while current_position > (DIAL_STEPS-1) {
-                current_position -= DIAL_STEPS;
-                zero_crossings += 1;
-            }
-            println!("{current_position} {zero_crossings}");
         }
         return zero_crossings;
     }
