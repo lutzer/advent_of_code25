@@ -93,9 +93,9 @@ impl AoCSolution for Solution2 {
                 }).collect();
             }).collect();
 
+            // add to sum
             removed_rolls += accessible_rolls_count;
 
-            // add to sum
             if (accessible_rolls_count == 0) {
                 break;
             }
@@ -108,7 +108,7 @@ fn main() {
     let solution1 = Solution1 {};
     let solution2 = Solution2 {};
     run(
-        "Advent of code day X", 
+        "Advent of code day 4", 
         &fs::read_to_string("input.txt").expect("Input Error"), 
         &vec![&solution1 as &dyn AoCSolution, &solution2 as &dyn AoCSolution]
     );
