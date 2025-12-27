@@ -1,6 +1,6 @@
 use std::process::exit;
 
-use clap::{Parser, Subcommand};
+use clap::{Parser};
 use itertools::Itertools;
 
 #[derive(Parser)]

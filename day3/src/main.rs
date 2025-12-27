@@ -1,5 +1,5 @@
 use common::{run, AoCSolution};
-use std::{fs};
+use std::{cmp::min, fs};
 
 struct Solution1 {}
 struct Solution2 {}
@@ -26,16 +26,58 @@ impl AoCSolution for Solution1 {
                 }
             }
 
-            return first.0 * 10 + second.0;
+            return (first.0 * 10 + second.0) as i64;
         });
 
-        return joltages.sum::<u32>() as i64;
+        return joltages.sum::<i64>();
     }
 }
 
+static JOLTAGE_LENGTH : usize = 12;
+
+fn find_max_digit(digits: &[u32]) -> (u32, usize) {
+
+    let mut max_val = 0;
+    let mut index = 0;
+    for i in 0..digits.len() {
+        if digits[i] > max_val {
+            max_val = digits[i];
+            index = i;
+        }
+    }
+
+    return (max_val, index)
+}
+
+fn calculate_joltage(digits: &Vec<u32>, joltage_length : usize) -> i64 {
+    let mut selected_vals : Vec<u32> = vec![0; JOLTAGE_LENGTH];
+    let mut start_index : usize = 0;
+    for i in 0..JOLTAGE_LENGTH {
+        let end_index = digits.len() - joltage_length + i + 1;
+        let (val,index) = find_max_digit(&digits[start_index..end_index]);
+        selected_vals[i] = val;
+        start_index += index + 1;
+    }
+    
+    return selected_vals.iter().enumerate().fold(0, |acc, (i, val)| {
+        return acc + (*val as i64) * 10i64.pow((selected_vals.len()-1-i) as u32);
+    });
+}
+
 impl AoCSolution for Solution2 {
+
+
     fn solve(&self, input: &str) -> i64 {
-        return 0
+        let banks = input.lines().map(|l| {
+            return l.chars().map(|c| { c.to_digit(10).unwrap() as u32 });
+        });
+
+        let joltages = banks.map( |bank| {
+            let digits : Vec<u32> = bank.collect();
+            return calculate_joltage(&digits, 12);
+        });
+
+        return joltages.sum::<i64>();
     }
 }
 
@@ -69,10 +111,38 @@ mod tests {
 
     #[test]
     fn test_part2() {
-        let input = String::from(indoc!{""});
+        let input = String::from(indoc!{"
+            987654321111111
+            811111111111119
+            234234234234278
+            818181911112111
+        "});
         
         let result = (&Solution2 {}).solve(&input);
-        assert_eq!(result, 0);
+        assert_eq!(result, 3121910778619);
+    }
+
+    #[test]
+    fn test_part2_joltages() {
+        let batteries : Vec<u32> = "987654321111111"
+            .chars()
+            .map(|c| { c.to_digit(10).unwrap() as u32 }).collect();
+        assert_eq!(calculate_joltage(&batteries, 12), 987654321111);
+
+        let batteries : Vec<u32> = "811111111111119"
+            .chars()
+            .map(|c| { c.to_digit(10).unwrap() as u32 }).collect();
+        assert_eq!(calculate_joltage(&batteries, 12), 811111111119);
+
+        let batteries : Vec<u32> = "234234234234278"
+            .chars()
+            .map(|c| { c.to_digit(10).unwrap() as u32 }).collect();
+        assert_eq!(calculate_joltage(&batteries, 12), 434234234278);
+
+        let batteries : Vec<u32> = "818181911112111"
+            .chars()
+            .map(|c| { c.to_digit(10).unwrap() as u32 }).collect();
+        assert_eq!(calculate_joltage(&batteries, 12), 888911112111);
     }
 }
 
