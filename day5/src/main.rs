@@ -32,7 +32,6 @@ impl AoCSolution for Solution1 {
         }).collect();
 
         return fresh_ingridients.iter().count() as i64;
-        //return 0;
     }
 }
 
@@ -50,8 +49,8 @@ impl AoCSolution for Solution2 {
                     return false
                 } else {
                     if from >= range.0 && from <= range.1 {
-                    // from, to overlaps on the left
-                    from = range.1+1;
+                        // from, to overlaps on the left
+                        from = range.1+1;
                     }
                     if to >= range.0 && to <= range.1 {
                         // from, to overlaps on the right
