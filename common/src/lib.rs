@@ -37,3 +37,21 @@ pub trait AoCSolution {
 pub fn remove_line_breaks(s: &String) -> String {
     return s.chars().filter(|c| !c.is_whitespace()).collect();
 }
+
+pub type CharMap = Vec<Vec<char>>;
+
+pub fn create_map_from(input: &String) -> CharMap {
+    return  input.lines().map(|l| {
+        let chars = l.chars().collect::<Vec<char>>();
+        return chars;
+    }).collect();
+}
+
+pub fn print_map(map: &CharMap) {
+    for i in 0..map.len() {
+        for j in 0..map[i].len() {
+            print!("{}", map[i][j]);
+        }
+        print!("\n");
+    }
+}
