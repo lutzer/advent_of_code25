@@ -1,4 +1,4 @@
-use common::{AoCSolution, CharMap, create_map_from, run};
+use common::{AoCSolution, CharMap, create_map_from, print_map, run};
 use std::{fs};
 
 struct Solution1 {}
@@ -28,7 +28,6 @@ impl AoCSolution for Solution1 {
         let mut split_sum = 0;
         for i in 0..map[0].len()-1 {
             split_sum += run_step(&mut map, i);
-            println!("{}", format!("{:?}", map));
         }
 
         return split_sum as i64;
@@ -36,34 +35,45 @@ impl AoCSolution for Solution1 {
 }
 
 
-fn calculate_timelines(map: &CharMap, (x,y): (usize, usize)) -> usize {
-        
-    // check if coordinates reached the end of map
-    if y >= map.len() || x >= map[y].len() {
-        return 1;
-    }
-
-
-    if map[y][x] == '^' {
-        //split one field left and right
-        return calculate_timelines(map, (x+1,y)) + calculate_timelines(map, (x-1,y))
-    } else {
-        // go straight down
-        return calculate_timelines(map, (x,y+1));
+fn calculate_timeline_row(timeline_map: &mut Vec<Vec<usize>>, map: &CharMap, row: usize) {
+    for i in 0..map[row].len() {
+        if map[row][i] == 'S' || map[row][i] == '|' {
+            if row >= map.len()-1 {
+                // if its the last row
+                timeline_map[row][i] = 1;
+            } else if map[row+1][i] == '|' {
+                // previous was beam
+                timeline_map[row][i] = timeline_map[row+1][i]
+            } else if map[row+1][i] == '^' {
+                // previous was splitter
+                timeline_map[row][i] = timeline_map[row+1][i-1] + timeline_map[row+1][i+1];
+            } else {
+                panic!("Shouldnt hit anything else than | or ^");
+            }
+        }
     }
 }
 
 impl AoCSolution for Solution2 {
     fn solve(&self, input: &str) -> i64 {
-        let map = create_map_from(&input.to_string());
+        let mut map = create_map_from(&input.to_string());
 
-        // serach for start
-        let start_x = map[0].iter().position(|c| *c == 'S').unwrap();
+        // solve map
+        for i in 0..map[0].len() {
+            run_step(&mut map, i);
+        }
 
         //calculate timelines
-        let timelines = calculate_timelines(&map, (start_x,0));
+        let mut timeline_map = vec![ vec![ 0; map[0].len()]; map.len() ];
+        for i in (0..map[0].len()+1).rev() {
+            calculate_timeline_row(&mut timeline_map, &map, i);
+        }
+        // print_map(&timeline_map);
+        // let timelines = calculate_timelines(&map, (start_x,0));
 
-        return timelines as i64;
+        let timelines_max = &timeline_map[0].iter().max().unwrap();
+
+        return **timelines_max as i64;
     }
 }
 

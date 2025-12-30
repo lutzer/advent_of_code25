@@ -1,4 +1,5 @@
 use std::process::exit;
+use std::fmt::Debug;
 
 use clap::{Parser};
 use itertools::Itertools;
@@ -47,11 +48,11 @@ pub fn create_map_from(input: &String) -> CharMap {
     }).collect();
 }
 
-pub fn print_map(map: &CharMap) {
+pub fn print_map<T: Debug>(map: &Vec<Vec<T>>) {
     for i in 0..map.len() {
         for j in 0..map[i].len() {
-            print!("{}", map[i][j]);
+            print!("{}", format!("{:?}", map[i][j]));
         }
-        print!("\n");
+        println!();
     }
 }
