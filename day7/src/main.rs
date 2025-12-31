@@ -69,7 +69,6 @@ impl AoCSolution for Solution2 {
             calculate_timeline_row(&mut timeline_map, &map, i);
         }
         // print_map(&timeline_map);
-        // let timelines = calculate_timelines(&map, (start_x,0));
 
         let timelines_max = &timeline_map[0].iter().max().unwrap();
 
