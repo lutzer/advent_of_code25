@@ -1,4 +1,5 @@
 use common::{run, AoCSolution};
+use core::f64;
 use std::{fs};
 
 struct Solution1 {
@@ -75,7 +76,64 @@ impl AoCSolution for Solution1 {
 
 impl AoCSolution for Solution2 {
     fn solve(&self, input: &str) -> i64 {
-        return 0
+        let junction_positions = input.lines().map(|l| {
+            let splits : Vec<&str> = l.split(",").collect();
+            let x = splits[0].parse::<i64>().unwrap();
+            let y = splits[1].parse::<i64>().unwrap();
+            let z = splits[2].parse::<i64>().unwrap();
+            return (x,y,z);
+        }).collect::<Vec<Vec3D>>();
+
+        // find shortest conections
+        let mut distances : Vec<Vec<f64>> = vec![ vec![f64::MAX; junction_positions.len()]; junction_positions.len()];
+        for i in 0..junction_positions.len() {
+            for j in i+1..junction_positions.len() {
+                distances[i][j] = eucludian_distance(junction_positions[i], junction_positions[j]);
+            }
+        }
+
+        // create circuit list
+        let mut circuits : Vec<Vec<usize>> = (0..junction_positions.len()).into_iter()
+            .map(|i| { vec![i] }).collect();
+
+        let mut from: usize = 0;
+        let mut to: usize = 0;
+        while circuits.len() > 1 {
+
+            //get shortest connection
+            (_, from, to) = distances.iter().enumerate().fold((f64::MAX,0,0),|acc,(i, row)| {
+                return row.iter().enumerate().fold(acc, |acc, (j,&dist)| {
+                    return if dist < acc.0 { (dist,i,j) } else { acc };
+                })
+            });
+
+            // put distance on max
+            distances[from][to] = f64::MAX;
+
+            // connect two circuits
+            let c1 = circuits.iter().find(|c| c.contains(&from)).unwrap().clone();
+            let c2 = circuits.iter().find(|c| c.contains(&to)).unwrap().clone();
+
+            // connect them if they are not already in the same circuit
+            if c1 != c2 {
+                // create new circuit
+                let connected_circuit = [c1.clone(),c2.clone()].concat();
+
+                // remove c1 and c2
+                circuits = circuits.into_iter()
+                    .filter(|c| c != &c1 && c != &c2)
+                    .collect();
+
+                // add to end
+                circuits.push(connected_circuit);
+            }
+
+        }
+
+        let j1 = junction_positions[from];
+        let j2 = junction_positions[to];
+
+        return j1.0 * j2.0;
     }
 }
 
@@ -124,10 +182,30 @@ mod tests {
 
     #[test]
     fn test_part2() {
-        let input = String::from(indoc!{""});
+        let input = String::from(indoc!{"
+162,817,812
+57,618,57
+906,360,560
+592,479,940
+352,342,300
+466,668,158
+542,29,236
+431,825,988
+739,650,466
+52,470,668
+216,146,977
+819,987,18
+117,168,530
+805,96,715
+346,949,466
+970,615,88
+941,993,340
+862,61,35
+984,92,344
+425,690,689"});
         
         let result = (&Solution2 {}).solve(&input);
-        assert_eq!(result, 0);
+        assert_eq!(result, 25272);
     }
 }
 
